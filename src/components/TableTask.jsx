@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { getTodos } from "../services/service";
+import { getTodos, deleteTodos } from "../services/service";
 import { FaListOl } from "react-icons/fa";
+import { Modal } from "antd";
+import DeleteModal from "./DeleteModal";
 const TableTask = () => {
   const [tasks, setTasks] = useState([]);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState();
+
   useEffect(() => {
     async function fetchData() {
       const fetchedTodos = await getTodos();
@@ -14,6 +19,29 @@ const TableTask = () => {
   if (tasks.length === 0) {
     <h1> Loading....</h1>;
   }
+  const handleDeleteClick = (id) => {
+    setSelectedTaskId(id);
+    console.log(id);
+
+    setShowDeleteModal(true);
+  };
+  function handleDeleteModal() {
+    setShowDeleteModal(false);
+  }
+  const handleDeleteTodo = async (id) => {
+    try {
+      await deleteTodos(id);
+      console.log(`Task with ID ${id} deleted successfully`);
+
+      setTasks((prevTasks) => prevTasks.filter((task) => task._id !== id));
+
+      // Close modal and reset selected task ID
+      setSelectedTaskId(null);
+      setShowDeleteModal(false);
+    } catch (err) {
+      console.error("Error deleting task:", err);
+    }
+  };
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
@@ -68,7 +96,11 @@ const TableTask = () => {
                   <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
                     Edit
                   </button>
-                  <button className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+
+                  <button
+                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                    onClick={() => handleDeleteClick(task._id)}
+                  >
                     Delete
                   </button>
                 </td>
@@ -77,6 +109,13 @@ const TableTask = () => {
           </tbody>
         </table>
       </div>
+      {showDeleteModal && (
+        <DeleteModal
+          taskId={selectedTaskId}
+          onDelete={handleDeleteTodo}
+          onClose={handleDeleteModal}
+        />
+      )}
     </div>
   );
 };
