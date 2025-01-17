@@ -19,7 +19,10 @@ const DeleteModal = ({ onClose, onDelete, taskId }) => {
           <p>Do you want to delete the task ?</p>
         </div>
         <div className="flex justify-center space-x-4 p-4">
-          <button className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">
+          <button
+            className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 "
+            onClick={handleClose}
+          >
             No
           </button>
           <button
