@@ -7,7 +7,7 @@ const DELETE_URL = "http://localhost:3000/api/task";
 export const saveTodos = async (task) => {
   if (task.Id) {
     try {
-      const response = await axios.put(`${TASK_URL}/${task.Id}`, task);
+      const response = await axios.put(`${TASK_URL}/${task.Id}`);
       return response.data;
     } catch (err) {
       throw new Error(`Error while updating todos: ${err.message}`);
