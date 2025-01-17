@@ -1,6 +1,27 @@
 import React from "react";
 
-const FormModal = () => {
+const FormModal = ({ onCancel }) => {
+  const [formData, setFormData] = useState({
+    assignedTo: "",
+    status: "",
+    DueDate: "",
+    priority: "",
+    comments: "",
+  });
+
+  function handleClick() {
+    onCancel();
+  }
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+    console.log(formData);
+  };
+
+  handleSubitForm(e) {
+    e.preventDefault()
+  }
   return (
     <div className="max-w-lg mx-auto bg-white shadow-md rounded-lg p-6">
       <h1 className="text-2xl font-semibold text-gray-700 mb-4">New Task</h1>
@@ -18,6 +39,8 @@ const FormModal = () => {
               type="text"
               name="assignedTo"
               id="assignedTo"
+              value={formData.assignedTo}
+              onChange={handleInputChange}
               className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm"
               required
             />
@@ -34,6 +57,8 @@ const FormModal = () => {
             <select
               name="status"
               id="status"
+              value={formData.status}
+              onChange={handleInputChange}
               className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm"
             >
               <option value="">Select Status</option>
@@ -55,6 +80,8 @@ const FormModal = () => {
               type="date"
               name="dueDate"
               id="dueDate"
+              value={formData.dueDate}
+              onChange={handleInputChange}
               className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm"
             />
           </div>
@@ -70,6 +97,8 @@ const FormModal = () => {
             <select
               name="priority"
               id="priority"
+              value={formData.priority}
+              //               onChange={handleInputChange}
               className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm"
             >
               <option value="">Select Priority</option>
@@ -91,6 +120,8 @@ const FormModal = () => {
           <textarea
             name="description"
             id="description"
+            value={formData.description}
+            onChange={handleInputChange}
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm"
             rows="4"
           ></textarea>
@@ -100,6 +131,7 @@ const FormModal = () => {
           <button
             type="button"
             className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400"
+            onClick={handleClick}
           >
             Cancel
           </button>
