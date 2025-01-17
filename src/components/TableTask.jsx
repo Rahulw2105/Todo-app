@@ -10,6 +10,8 @@ const TableTask = () => {
   const [selectedTaskId, setSelectedTaskId] = useState();
   const [showFormModal, setShowFormModal] = useState(false);
   const [initialValues, setInitialValues] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [recordsPerPage, setRecordsPerPage] = useState(5);
 
   useEffect(() => {
     async function fetchData() {
@@ -19,9 +21,7 @@ const TableTask = () => {
     }
     fetchData();
   }, []);
-  //   if (tasks.length === 0) {
-  //     <h1> Loading....</h1>;
-  //   }
+
   const handleDeleteClick = (id) => {
     setSelectedTaskId(id);
     console.log(id);
@@ -87,12 +87,21 @@ const TableTask = () => {
   async function handleRefresh() {
     await window.location.reload();
   }
+  const indexOfLastTask = currentPage * recordsPerPage;
+  const indexOfFirstTask = indexOfLastTask - recordsPerPage;
+  const currentTasks = tasks.slice(indexOfFirstTask, indexOfLastTask);
+  const totalPages = Math.ceil(tasks.length / recordsPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <div>
           <FaListOl />
-          <h1 className="text-xl font-bold">tasks</h1>
+          <h1 className="text-xl  text-red-600 font-bold">tasks</h1>
           {tasks.length}Records
         </div>
         <div>
@@ -113,11 +122,6 @@ const TableTask = () => {
         </div>
       </div>
       <div className="mb-4">
-        <input
-          type="text"
-          placeholder="Search by Assigned To"
-          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-yellow-200"
-        />
         <div className="mb-4">
           <input
             type="text"
@@ -163,6 +167,39 @@ const TableTask = () => {
             ))}
           </tbody>
         </table>
+        <div className="flex justify-center items-center mt-4">
+          <button
+            className="px-3 py-1 border border-gray-300 rounded-l disabled:opacity-50"
+            disabled={currentPage === 1}
+            onClick={() => handlePageChange(1)}
+          >
+            First
+          </button>
+          <button
+            className="px-3 py-1 border border-gray-300 disabled:opacity-50"
+            disabled={currentPage === 1}
+            onClick={() => handlePageChange(currentPage - 1)}
+          >
+            Prev
+          </button>
+          <span className="px-3 py-1 border border-gray-300 bg-gray-100">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            className="px-3 py-1 border border-gray-300 disabled:opacity-50"
+            disabled={currentPage === totalPages}
+            onClick={() => handlePageChange(currentPage + 1)}
+          >
+            Next
+          </button>
+          <button
+            className="px-3 py-1 border border-gray-300 rounded-r disabled:opacity-50"
+            disabled={currentPage === totalPages}
+            onClick={() => handlePageChange(totalPages)}
+          >
+            Last
+          </button>
+        </div>
       </div>
       {showFormModal && (
         <FormModal
