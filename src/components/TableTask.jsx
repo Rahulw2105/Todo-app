@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getTodos, deleteTodos } from "../services/service";
+import { getTodos, deleteTodos, saveTodos } from "../services/service";
 import { FaListOl } from "react-icons/fa";
 import { Modal } from "antd";
 import DeleteModal from "./DeleteModal";
@@ -9,6 +9,7 @@ const TableTask = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState();
   const [showFormModal, setShowFormModal] = useState(false);
+  const [initialValues, setInitialValues] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -18,9 +19,9 @@ const TableTask = () => {
     }
     fetchData();
   }, []);
-  if (tasks.length === 0) {
-    <h1> Loading....</h1>;
-  }
+  //   if (tasks.length === 0) {
+  //     <h1> Loading....</h1>;
+  //   }
   const handleDeleteClick = (id) => {
     setSelectedTaskId(id);
     console.log(id);
@@ -30,9 +31,9 @@ const TableTask = () => {
   function handleDeleteModal() {
     setShowDeleteModal(false);
   }
-  function handleFormModal() {
-    setShowFormModal(false);
-  }
+  //   function handleFormModal() {
+  //     setShowFormModal(false);
+  //   }
   const handleDeleteTodo = async (id) => {
     try {
       await deleteTodos(id);
@@ -50,8 +51,32 @@ const TableTask = () => {
 
   //edit
   function handleEditClick(id) {
-    setSelectedTaskId(id);
+    // const taskToEdit = tasks.find((task) => task._id === id);
+    // setInitialValues(taskToEdit); // Pass the task as initial values
     setShowFormModal(true);
+    console.log(id);
+    setSelectedTaskId(id);
+  }
+
+  async function handleEditSave(updatedTask) {
+    try {
+      if (initialValues) {
+        // Editing existing task
+        await saveTodos(updatedTask);
+        setTasks((prevTasks) =>
+          prevTasks.map((task) =>
+            task._id === updatedTask._id ? updatedTask : task
+          )
+        );
+      } else {
+        // Creating new task
+        const newTask = await saveTodos(updatedTask);
+        setTasks((prevTasks) => [...prevTasks, newTask]);
+      }
+      setShowFormModal(false);
+    } catch (error) {
+      console.error("Error saving task:", error);
+    }
   }
 
   // new task
@@ -139,15 +164,20 @@ const TableTask = () => {
           </tbody>
         </table>
       </div>
+      {showFormModal && (
+        <FormModal
+          editTaskId={selectedTaskId}
+          //   onCancel={handleFormModal}
+          onSave={handleEditSave}
+          existingTodos={tasks}
+        />
+      )}
       {showDeleteModal && (
         <DeleteModal
           taskId={selectedTaskId}
           onDelete={handleDeleteTodo}
           onClose={handleDeleteModal}
         />
-      )}
-      {showFormModal && (
-        <FormModal onCancel={handleFormModal} onSave={handleSaveTodo} />
       )}
     </div>
   );
