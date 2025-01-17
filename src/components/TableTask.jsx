@@ -3,10 +3,12 @@ import { getTodos, deleteTodos } from "../services/service";
 import { FaListOl } from "react-icons/fa";
 import { Modal } from "antd";
 import DeleteModal from "./DeleteModal";
+import FormModal from "./FormModal";
 const TableTask = () => {
   const [tasks, setTasks] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState();
+  const [showFormModal, setShowFormModal] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -28,6 +30,9 @@ const TableTask = () => {
   function handleDeleteModal() {
     setShowDeleteModal(false);
   }
+  function handleFormModal() {
+    setShowFormModal(false);
+  }
   const handleDeleteTodo = async (id) => {
     try {
       await deleteTodos(id);
@@ -42,19 +47,41 @@ const TableTask = () => {
       console.error("Error deleting task:", err);
     }
   };
+
+  //edit
+  function handleEditClick(id) {
+    setSelectedTaskId(id);
+    setShowFormModal(true);
+  }
+
+  // new task
+  function handleNewTask() {
+    setShowFormModal(true);
+  }
+  // refresh Button
+  async function handleRefresh() {
+    await window.location.reload();
+  }
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <div>
           <FaListOl />
           <h1 className="text-xl font-bold">tasks</h1>
+          {tasks.length}Records
         </div>
         <div>
-          <button className="bg-yellow-500 text-white p-2 rounded-md">
+          <button
+            className="bg-yellow-500 text-white p-2 rounded-md"
+            onClick={handleNewTask}
+          >
             {" "}
             New task
           </button>
-          <button className="bg-yellow-500 text-white ml-5 rounded-md p-2">
+          <button
+            className="bg-yellow-500 text-white ml-5 rounded-md p-2"
+            onClick={handleRefresh}
+          >
             {" "}
             Refresh{" "}
           </button>
@@ -93,7 +120,10 @@ const TableTask = () => {
                 <td className="py-2 px-4 border-b">{task.priority}</td>
                 <td className="py-2 px-4 border-b">{task.comments}</td>
                 <td className="py-2 px-4 border-b flex space-x-2">
-                  <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+                  <button
+                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                    onClick={() => handleEditClick(task._id)}
+                  >
                     Edit
                   </button>
 
@@ -115,6 +145,9 @@ const TableTask = () => {
           onDelete={handleDeleteTodo}
           onClose={handleDeleteModal}
         />
+      )}
+      {showFormModal && (
+        <FormModal onCancel={handleFormModal} onSave={handleSaveTodo} />
       )}
     </div>
   );
